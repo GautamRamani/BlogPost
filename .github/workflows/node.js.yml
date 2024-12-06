@@ -6,22 +6,31 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: self-hosted  # Runs on your self-hosted runner
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [20.x]  # Node.js version matrix
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4  # Step to check out your code
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
+    - name: Debug: Print GitHub Secrets
+      run: |
+        echo "MONGO_SRV=${{ secrets.MONGO_SRV }}"  # Debugging secret value
+        echo "PORT=${{ secrets.PORT }}"  # Debugging secret value
+
     - name: Create .env file
       run: |
-        echo "MONGO_SRV=${{ secrets.MONGO_SRV }}" >> .env
-        echo "PORT=${{ secrets.PORT }}" >> .env
-    - run: npm ci
-    - run: pm2 restart src/app.js
+        echo "MONGO_SRV=${{ secrets.MONGO_SRV }}" >> .env  # Write MONGO_SRV to .env
+        echo "PORT=${{ secrets.PORT }}" >> .env  # Write PORT to .env
+        cat .env  # Print the .env file to verify contents
+
+    - run: npm ci  # Install dependencies
+    - run: pm2 restart src/app.js  # Restart your application with PM2
